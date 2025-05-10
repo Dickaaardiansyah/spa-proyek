@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pesona Alam - SPA</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.3/leaflet.css" />
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <style>
+    .hidden { display: none; }
+    .map-container { height: 300px; margin-top: 1rem; }
+    .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+    .modal-content { background: white; margin: 10% auto; padding: 20px; width: 80%; max-width: 600px; }
+    .camera-preview video { width: 100%; max-width: 300px; }
+  </style>
+</head>
+<body>
+
+<!-- === HEADER === -->
+<header class="navbar">
+  <div class="logo">Pesona Alam</div>
+  <button class="login-btn" id="openLoginDialog">Masuk</button>
+  <button class="logout-btn hidden" id="logoutBtn">Logout</button>
+</header>
+
+<!-- === HERO / LANDING === -->
+<main id="heroSection">
+  <section class="hero">
+    <div class="hero-left">
+      <img src="/hawimau.png" alt="Illustration" class="hero-img" />
+    </div>
+    <div class="hero-right">
+      <h1>Pesona Alam</h1>
+      <p>Nikmati Keindahan Alam, Bersyukur Terhadap Anugerah Tuhan.</p>
+      <button class="cta-btn" id="openRegisterDialog">Daftar</button>
+    </div>
+  </section>
+</main>
+
+<!-- === LOGIN/REGISTER DIALOG === -->
+<dialog id="loginDialog">
+  <div class="login-form-container">
+    <form id="loginForm" class="form">
+      <h2>Login</h2>
+      <input type="email" id="loginEmail" placeholder="Email" required />
+      <input type="password" id="loginPassword" placeholder="Password" required />
+      <button type="submit">Login</button>
+      <button type="button" id="closeDialog">Tutup</button>
+      <div class="error-message" id="loginError"></div>
+      <a href="#" id="switchToRegister">Belum punya akun? Daftar</a>
+    </form>
+
+    <form id="registerForm" class="form hidden">
+      <h2>Register</h2>
+      <input type="text" id="regUsername" placeholder="Username" required />
+      <input type="email" id="regEmail" placeholder="Email" required />
+      <input type="password" id="regPassword" placeholder="Password" required />
+      <button type="submit">Daftar</button>
+      <button type="button" id="closeDialog2">Tutup</button>
+      <div class="error-message" id="registerError"></div>
+      <a href="#" id="switchToLogin">Sudah punya akun? Login</a>
+    </form>
+  </div>
+</dialog>
+
+<!-- === DASHBOARD === -->
+<main id="dashboard" class="hidden">
+  <h1 class="welcome-text">Welcome, <span id="username">User</span>!</h1>
+
+  <div class="dashboard-content">
+    <h2>Your Dashboard</h2>
+
+    <form id="storyForm">
+      <label for="description">Description:</label>
+      <textarea id="description" name="description" required></textarea>
+
+      <label for="photo">Photo:</label>
+      <input type="file" id="photo" name="photo" accept="image/*" />
+      <button type="button" id="takePhotoBtn">Take Photo</button>
+      <div id="cameraPreview" class="camera-preview hidden">
+        <video id="cameraVideo" autoplay></video>
+        <div class="camera-controls">
+          <button type="button" id="captureBtn">Capture</button>
+          <button type="button" id="closeCameraBtn">Close</button>
+        </div>
+        <canvas id="captureCanvas" class="hidden"></canvas>
+      </div>
+
+      <div class="media-input">
+        <label>Audio Note:</label>
+        <button type="button" id="recordAudioBtn">Record Audio</button>
+        <div id="audioRecorder" class="audio-recorder hidden">
+          <div class="audio-controls">
+            <button type="button" id="startRecordingBtn">Start</button>
+            <button type="button" id="stopRecordingBtn" disabled>Stop</button>
+          </div>
+          <div id="audioPlayer" class="hidden">
+            <audio id="audioPreview" controls></audio>
+          </div>
+        </div>
+      </div>
+
+      <div class="location-input">
+        <h3>Location</h3>
+        <button type="button" id="getCurrentLocationBtn">Get Current Location</button>
+        <p id="locationStatus"></p>
+        <div id="map" class="map-container"></div>
+        <input type="hidden" id="lat" name="lat" />
+        <input type="hidden" id="lon" name="lon" />
+      </div>
+
+      <button type="submit">Submit Story</button>
+    </form>
+
+    <div id="storiesContainer"></div>
+    <div id="storiesMap" class="map-container"></div>
+  </div>
+</main>
+
+<!-- === MODAL === -->
+<div id="storyDetailModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" id="closeModal">&times;</span>
+    <div id="storyDetailContent"></div>
+  </div>
+</div>
+
+<!-- === SCRIPT === -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.3/leaflet.js"></script>
+<script src="./index.js"></script>
+</body>
+</html>
