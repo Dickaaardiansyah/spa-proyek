@@ -14,121 +14,170 @@
     .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
     .modal-content { background: white; margin: 10% auto; padding: 20px; width: 80%; max-width: 600px; }
     .camera-preview video { width: 100%; max-width: 300px; }
+    
+    /* Skip to content styling */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #000;
+      color: white;
+      padding: 8px;
+      z-index: 1000;
+      transition: top 0.3s;
+    }
+    
+    .skip-link:focus {
+      top: 0;
+    }
   </style>
 </head>
 <body>
+  <!-- Skip to content link -->
+  <a href="" class="skip-link">Skip to content</a>
 
-<!-- === HEADER === -->
-<header class="navbar">
-  <div class="logo">Pesona Alam</div>
-  <button class="login-btn" id="openLoginDialog">Masuk</button>
-  <button class="logout-btn hidden" id="logoutBtn">Logout</button>
-</header>
+  <!-- === HEADER === -->
+  <header class="navbar" role="banner">
+    <div class="logo">Pesona Alam</div>
+    <nav role="navigation">
+      <button class="login-btn" id="openLoginDialog" aria-label="Open login dialog">Masuk</button>
+      <button class="logout-btn hidden" id="logoutBtn" aria-label="Logout">Logout</button>
+    </nav>
+  </header>
 
-<!-- === HERO / LANDING === -->
-<main id="heroSection">
-  <section class="hero">
-    <div class="hero-left">
-      <img src="/hawimau.png" alt="Illustration" class="hero-img" />
-    </div>
-    <div class="hero-right">
-      <h1>Pesona Alam</h1>
-      <p>Nikmati Keindahan Alam, Bersyukur Terhadap Anugerah Tuhan.</p>
-      <button class="cta-btn" id="openRegisterDialog">Daftar</button>
-    </div>
-  </section>
-</main>
-
-<!-- === LOGIN/REGISTER DIALOG === -->
-<dialog id="loginDialog">
-  <div class="login-form-container">
-    <form id="loginForm" class="form">
-      <h2>Login</h2>
-      <input type="email" id="loginEmail" placeholder="Email" required />
-      <input type="password" id="loginPassword" placeholder="Password" required />
-      <button type="submit">Login</button>
-      <button type="button" id="closeDialog">Tutup</button>
-      <div class="error-message" id="loginError"></div>
-      <a href="#" id="switchToRegister">Belum punya akun? Daftar</a>
-    </form>
-
-    <form id="registerForm" class="form hidden">
-      <h2>Register</h2>
-      <input type="text" id="regUsername" placeholder="Username" required />
-      <input type="email" id="regEmail" placeholder="Email" required />
-      <input type="password" id="regPassword" placeholder="Password" required />
-      <button type="submit">Daftar</button>
-      <button type="button" id="closeDialog2">Tutup</button>
-      <div class="error-message" id="registerError"></div>
-      <a href="#" id="switchToLogin">Sudah punya akun? Login</a>
-    </form>
-  </div>
-</dialog>
-
-<!-- === DASHBOARD === -->
-<main id="dashboard" class="hidden">
-  <h1 class="welcome-text">Welcome, <span id="username">User</span>!</h1>
-
-  <div class="dashboard-content">
-    <h2>Your Dashboard</h2>
-
-    <form id="storyForm">
-      <label for="description">Description:</label>
-      <textarea id="description" name="description" required></textarea>
-
-      <label for="photo">Photo:</label>
-      <input type="file" id="photo" name="photo" accept="image/*" />
-      <button type="button" id="takePhotoBtn">Take Photo</button>
-      <div id="cameraPreview" class="camera-preview hidden">
-        <video id="cameraVideo" autoplay></video>
-        <div class="camera-controls">
-          <button type="button" id="captureBtn">Capture</button>
-          <button type="button" id="closeCameraBtn">Close</button>
+  <!-- === HERO / LANDING === -->
+  <main id="mainContent" tabindex="-1">
+    <section id="heroSection" data-route="home" aria-labelledby="hero-title">
+      <div class="hero">
+        <div class="hero-left">
+          <img src="/hawimau.png" alt="Pemandangan alam Indonesia dengan gunung, hutan hijau, dan air terjun yang menggambarkan keindahan Pesona Alam" class="hero-img" />
         </div>
-        <canvas id="captureCanvas" class="hidden"></canvas>
-      </div>
-
-      <div class="media-input">
-        <label>Audio Note:</label>
-        <button type="button" id="recordAudioBtn">Record Audio</button>
-        <div id="audioRecorder" class="audio-recorder hidden">
-          <div class="audio-controls">
-            <button type="button" id="startRecordingBtn">Start</button>
-            <button type="button" id="stopRecordingBtn" disabled>Stop</button>
-          </div>
-          <div id="audioPlayer" class="hidden">
-            <audio id="audioPreview" controls></audio>
-          </div>
+        <div class="hero-right">
+          <h1 id="hero-title">Pesona Alam</h1>
+          <p>Nikmati Keindahan Alam, Bersyukur Terhadap Anugerah Tuhan.</p>
+          <button class="cta-btn" id="openRegisterDialog" aria-label="Register account">Daftar</button>
         </div>
       </div>
+    </section>
 
-      <div class="location-input">
-        <h3>Location</h3>
-        <button type="button" id="getCurrentLocationBtn">Get Current Location</button>
-        <p id="locationStatus"></p>
-        <div id="map" class="map-container"></div>
-        <input type="hidden" id="lat" name="lat" />
-        <input type="hidden" id="lon" name="lon" />
+    <!-- === DASHBOARD === -->
+    <section id="dashboard" class="hidden" data-route="dashboard" aria-labelledby="dashboard-title">
+      <h1 class="welcome-text" id="dashboard-title">Welcome, <span id="username">User</span>!</h1>
+      <div class="dashboard-content">
+        <h2>Your Dashboard</h2>
+
+        <form id="storyForm" aria-labelledby="story-form-title">
+          <h3 id="story-form-title">Create New Story</h3>
+          
+          <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" required aria-describedby="description-help"></textarea>
+            <p id="description-help" class="help-text">Describe your nature experience</p>
+          </div>
+
+          <div class="form-group">
+            <label for="photo">Photo:</label>
+            <input type="file" id="photo" name="photo" accept="image/*" aria-describedby="photo-help" />
+            <p id="photo-help" class="help-text">Upload an image of your experience</p>
+            <button type="button" id="takePhotoBtn" aria-controls="cameraPreview">Take Photo</button>
+            
+            <div id="cameraPreview" class="camera-preview hidden" aria-live="polite">
+              <video id="cameraVideo" autoplay></video>
+              <div class="camera-controls">
+                <button type="button" id="captureBtn" aria-label="Capture photo">Capture</button>
+                <button type="button" id="closeCameraBtn" aria-label="Close camera">Close</button>
+              </div>
+              <canvas id="captureCanvas" class="hidden"></canvas>
+            </div>
+          </div>
+
+          <div class="media-input form-group">
+            <label for="recordAudioBtn">Audio Note:</label>
+            <button type="button" id="recordAudioBtn" aria-controls="audioRecorder">Record Audio</button>
+            <div id="audioRecorder" class="audio-recorder hidden" aria-live="polite">
+              <div class="audio-controls">
+                <button type="button" id="startRecordingBtn" aria-label="Start recording">Start</button>
+                <button type="button" id="stopRecordingBtn" disabled aria-label="Stop recording">Stop</button>
+              </div>
+              <div id="audioPlayer" class="hidden">
+                <audio id="audioPreview" controls></audio>
+              </div>
+            </div>
+          </div>
+
+          <div class="location-input form-group">
+            <h3 id="location-title">Location</h3>
+            <button type="button" id="getCurrentLocationBtn" aria-describedby="locationStatus">Get Current Location</button>
+            <p id="locationStatus" aria-live="polite"></p>
+            <div id="map" class="map-container" aria-label="Map showing selected location" role="application"></div>
+            <input type="hidden" id="lat" name="lat" />
+            <input type="hidden" id="lon" name="lon" />
+          </div>
+
+          <button type="submit">Submit Story</button>
+        </form>
+
+        <section aria-labelledby="stories-title">
+          <h3 id="stories-title">Your Stories</h3>
+          <div id="storiesContainer" aria-live="polite"></div>
+          <div id="storiesMap" class="map-container" aria-label="Map showing locations of all stories" role="application"></div>
+        </section>
       </div>
+    </section>
+  </main>
 
-      <button type="submit">Submit Story</button>
-    </form>
+  <!-- === LOGIN/REGISTER DIALOG === -->
+  <dialog id="loginDialog" aria-labelledby="login-title">
+    <div class="login-form-container">
+      <form id="loginForm" class="form">
+        <h2 id="login-title">Login</h2>
+        <div class="form-group">
+          <label for="loginEmail">Email:</label>
+          <input type="email" id="loginEmail" placeholder="Email" required />
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password:</label>
+          <input type="password" id="loginPassword" placeholder="Password" required />
+        </div>
+        <button type="submit">Login</button>
+        <button type="button" id="closeDialog">Tutup</button>
+        <div class="error-message" id="loginError" aria-live="assertive"></div>
+        <a href="#" id="switchToRegister">Belum punya akun? Daftar</a>
+      </form>
 
-    <div id="storiesContainer"></div>
-    <div id="storiesMap" class="map-container"></div>
+      <form id="registerForm" class="form hidden" aria-labelledby="register-title">
+        <h2 id="register-title">Register</h2>
+        <div class="form-group">
+          <label for="regUsername">Username:</label>
+          <input type="text" id="regUsername" placeholder="Username" required />
+        </div>
+        <div class="form-group">
+          <label for="regEmail">Email:</label>
+          <input type="email" id="regEmail" placeholder="Email" required />
+        </div>
+        <div class="form-group">
+          <label for="regPassword">Password:</label>
+          <input type="password" id="regPassword" placeholder="Password" required />
+        </div>
+        <button type="submit">Daftar</button>
+        <button type="button" id="closeDialog2">Tutup</button>
+        <div class="error-message" id="registerError" aria-live="assertive"></div>
+        <a href="#" id="switchToLogin">Sudah punya akun? Login</a>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- === MODAL === -->
+  <div id="storyDetailModal" class="modal" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
+    <div class="modal-content">
+      <span class="close-modal" id="closeModal" aria-label="Close modal">&times;</span>
+      <h2 id="modalTitle">Story Details</h2>
+      <div id="storyDetailContent"></div>
+    </div>
   </div>
-</main>
 
-<!-- === MODAL === -->
-<div id="storyDetailModal" class="modal">
-  <div class="modal-content">
-    <span class="close-modal" id="closeModal">&times;</span>
-    <div id="storyDetailContent"></div>
-  </div>
-</div>
-
-<!-- === SCRIPT === -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.3/leaflet.js"></script>
-<script src="./index.js"></script>
+  <!-- === SCRIPT === -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.3/leaflet.js"></script>
+  <script type="module" src="./index.js"></script>
 </body>
 </html>

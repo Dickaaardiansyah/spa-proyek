@@ -1,6 +1,10 @@
+import { router, setupRoutes } from './routes.js';
 document.addEventListener('DOMContentLoaded', function () {
+  setupRoutes();
   checkAuthStatus();
   initializeLoginPage(); // Always initialize login components regardless of auth status
+  updateActiveNavLink(); // Initialize active nav link highlighting
+  checkAuthStatus();
 });
 
 // Check authentication status and update UI accordingly
@@ -11,13 +15,35 @@ function checkAuthStatus() {
     document.getElementById('dashboard')?.classList.remove('hidden');
     document.getElementById('openLoginDialog')?.classList.add('hidden');
     document.getElementById('logoutBtn')?.classList.remove('hidden');
+    document.querySelectorAll('.nav-link').forEach(link => {
     initializeDashboard();
+    link.classList.remove('auth-required-hidden');
+    });
+    
   } else {
     document.getElementById('heroSection')?.classList.remove('hidden');
     document.getElementById('dashboard')?.classList.add('hidden');
     document.getElementById('openLoginDialog')?.classList.remove('hidden');
     document.getElementById('logoutBtn')?.classList.add('hidden');
+    document.querySelectorAll('.nav-link.auth-required').forEach(link => {
+      link.classList.add('auth-required-hidden');
+    });
   }
+
+  function updateActiveNavLink() {
+    const currentPath = router.getPath();
+    document.querySelectorAll('.nav-link').forEach(link => {
+      const linkPath = link.getAttribute('href').slice(1); // Remove the #
+      if (linkPath === currentPath) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+  }
+  
+  // Add this event listener to update active link when route changes
+  window.addEventListener('hashchange', updateActiveNavLink);
 }
 
 function initializeLoginPage() {
@@ -312,7 +338,8 @@ async function handleLogin(e) {
         timer: 1500,
         showConfirmButton: false
       }).then(() => {
-        checkAuthStatus(); // Update UI based on authentication status
+        checkAuthStatus();
+        router.navigateTo('/dashboard'); // Update UI based on authentication status
       });
       
     } else {
@@ -351,7 +378,7 @@ function initializeDashboard() {
   const name = localStorage.getItem('name');
 
   if (!token) {
-    checkAuthStatus(); // Ensure UI is updated properly
+    router.navigateTo('/'); // Ensure UI is updated properly
     return;
   }
 
@@ -410,8 +437,8 @@ function handleLogout() {
             showConfirmButton: false,
             timer: 1500
           }).then(() => {
+            router.navigateTo('/'); // Navigate to home page
             checkAuthStatus(); // Update UI based on authentication status
-            initializeLoginPage(); // Reinitialize login page components
           });
         })
         .catch((error) => {
@@ -450,56 +477,42 @@ async function logoutFromServer() {
     return { message: 'Logged out locally' };
   }
 }
-  
-  function showLoading() {
-    let loadingOverlay = document.getElementById('loadingOverlay');
-    if (!loadingOverlay) {
-      loadingOverlay = document.createElement('div');
-      loadingOverlay.id = 'loadingOverlay';
-      loadingOverlay.innerHTML = `<div class="loading-spinner"></div>`;
-      document.body.appendChild(loadingOverlay);
-    }
-    loadingOverlay.style.display = 'flex';
+
+// Map initialization and functionality
+let map = null;
+let storiesMap = null;
+let userMarker = null;
+let markers = [];
+
+function initializeMap() {
+  // Initialize location map for new story
+  map = L.map('map').setView([-6.200000, 106.816666], 13); // Default to Jakarta
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  // Initialize stories map
+  storiesMap = L.map('storiesMap').setView([-6.200000, 106.816666], 5); // Wider view for Indonesia
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(storiesMap);
+
+  // Get current location button
+  const getCurrentLocationBtn = document.getElementById('getCurrentLocationBtn');
+  if (getCurrentLocationBtn) {
+    getCurrentLocationBtn.addEventListener('click', getUserLocation);
   }
-  
-  function hideLoading() {
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    if (loadingOverlay) {
-      loadingOverlay.style.display = 'none';
-    }
-  }
-  
-  // Map initialization and functionality
-  let map = null;
-  let storiesMap = null;
-  let userMarker = null;
-  let markers = [];
-  
-  function initializeMap() {
-    // Initialize location map for new story
-    map = L.map('map').setView([-6.200000, 106.816666], 13); // Default to Jakarta
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-  
-    // Initialize stories map
-    storiesMap = L.map('storiesMap').setView([-6.200000, 106.816666], 5); // Wider view for Indonesia
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(storiesMap);
-  
-    // Get current location button
-    const getCurrentLocationBtn = document.getElementById('getCurrentLocationBtn');
-    if (getCurrentLocationBtn) {
-      getCurrentLocationBtn.addEventListener('click', getUserLocation);
-    }
-  
-    // Make maps responsive when container becomes visible
-    setTimeout(() => {
-      map.invalidateSize();
-      storiesMap.invalidateSize();
-    }, 100);
-  }
+
+  // Make maps responsive when container becomes visible
+  setTimeout(() => {
+    map.invalidateSize();
+    storiesMap.invalidateSize();
+  }, 100);
+}
+
+window.initializeDashboard = initializeDashboard;
+window.fetchStories = fetchStories;
+window.checkAuthStatus = checkAuthStatus;
   
   function getUserLocation() {
     const locationStatus = document.getElementById('locationStatus');
@@ -1066,3 +1079,5 @@ async function logoutFromServer() {
     // Force map to refresh
     storiesMap.invalidateSize();
   }
+
+  export { initializeDashboard, fetchStories, checkAuthStatus };
